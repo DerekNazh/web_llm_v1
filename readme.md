@@ -6,7 +6,7 @@
 
 ## 项目架构
 
-![b025707e32e64863725e4919009a0f3png](file:///E:/other/oldMemory/wechat/WeChat%20Files/wxid_r4zxlvnzd7xo22/FileStorage/Temp/b025707e32e64863725e4919009a0f3.png?msec=1753705196804)
+![b025707e32e64863725e4919009a0f3png](file:///b025707e32e64863725e4919009a0f3.png)
 
 ## 项目流程
 
