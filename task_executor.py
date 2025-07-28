@@ -21,7 +21,6 @@ calculator.register_module_scripts()
 logging.error(f"脚本注册完成")
 app = FastAPI()
 
-
 def execute(task_params: dict):
     # 获取路径
     import_path = task_params['import_path']
@@ -46,14 +45,10 @@ def execute(task_params: dict):
         logging.error('根据路径锁定脚本失败')
         raise OuterException(f'根据路径锁定脚本失败 {e}')
 
-
-
-
+    #执行选定脚本
     output = func(task_params)
-
+    #输出
     return output
-
-
 
 @app.post('/poxiaoaibaipiao')
 def inf_invoke(params: dict):
@@ -68,31 +63,30 @@ def inf_invoke(params: dict):
         prompt = params['prompt']
         priority =  params['priority']
 
-
-
+        #判断提示词是否合法
         if not prompt:
             logging.exception("提示词无效，请重新请求")
             return {'code':502,'reply':'提示词无效，请重新更改'}
 
-
         #策略计算器返回最佳状态模型记录器
         cur_module_recorder = calculator.calculate_invoke()
 
-
+        #获取记录器名称
         recorder_name = cur_module_recorder.recorder_name
-
+        #获取脚本导入路径
         model = os.path.basename(recorder_name).replace('_dp', '')
-
+        #构建参数
         task_params = {
             'import_path':recorder_name,
             'prompt':prompt,
             'priority':priority
         }
-
+        #输出
         output = execute(task_params)
+        #执行成功标识
         invoke_success = True
 
-
+        #正常执行输出json
         if output:
             return JSONResponse({
                 'code':200,
@@ -115,7 +109,7 @@ def inf_invoke(params: dict):
         logging.error('需计算策略记录器')
         cur_module_recorder.fail_record()
 
-
+        #捕获内部异常输出
         return JSONResponse({
             'code': 501,
             'msg': e.message,
@@ -124,6 +118,7 @@ def inf_invoke(params: dict):
         })
     except OuterException as e:
         logging.error("非平台原因结束，无需使用记录器")
+        #捕获外部异常输出
         return JSONResponse({
             'code': 502,
             'msg': e.message,
@@ -131,9 +126,9 @@ def inf_invoke(params: dict):
             'time': time.time() - start
         })
 
-
     except Exception as e:
         logging.exception(f"执行任务失败:{e}")
+        #非异常抛出报错输出
         return JSONResponse({
             'code':503,
             'msg':f'执行任务失败,{e}',
@@ -159,10 +154,6 @@ def start_up_ai_server():
     unicorn.run(app, host=get_local_ip(), port=9811)
 
     logging.error("-----------服务执行结束--------------")
-
-
-
-
 
 if __name__ == '__main__':
     start_up_ai_server()
